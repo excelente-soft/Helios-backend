@@ -1,5 +1,5 @@
 {
-  "name": "Helios-backend",
+  "name": "helios-backend",
   "version": "1.0.0",
   "repository": "https://github.com/excelente-soft/Helios-backend.git",
   "license": "MIT",
@@ -10,6 +10,8 @@
     "sequelize": "^6.17.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
