@@ -1,12 +1,12 @@
 import express from 'express';
+import { PORT, VERSION } from '@config';
+import authRoute from '@routes/auth.route';
 
 const app = express();
-const port = 8080;
+const path = `/v${VERSION}/api`;
 
-app.get('/', (req, res) => {
-  res.send('Hello from server');
-});
+app.use(path, authRoute);
 
-app.listen(port, () => {
-  console.log(`server started at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server started at http://localhost:${PORT}${path}`);
 });

@@ -2,9 +2,9 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "commonjs",
-    "baseUrl": "./src",
+    "baseUrl": "src",
     "paths": {
-      "@config": ["config"],
+      "@config": ["config/index.ts"],
       "@controllers/*": ["controllers/*"],
       "@databases": ["databases"],
       "@interfaces/*": ["interfaces/*"],
@@ -13,12 +13,14 @@
       "@utils/*": ["utils/*"]
     },
     "pretty": true,
+    "allowJs": true,
     "sourceMap": false,
     "outDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node"
   },
   "include": ["src/**/*.ts", "src/**/*.json", ".env"],
   "exclude": ["node_modules"]
