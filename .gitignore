@@ -6,3 +6,4 @@
 .yarn/install-state.gz
 .pnp.*
 .npm
+/dist
