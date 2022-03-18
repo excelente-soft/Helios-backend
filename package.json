@@ -25,6 +25,7 @@
     "typescript": "^4.6.2"
   },
   "scripts": {
+    "format": "prettier --write .",
     "husky:check-lint": "eslint src/**/*.ts",
     "husky:check-format": "eslint src/**/*.ts --fix",
     "husky:check-types": "tsc --pretty --noEmit",
