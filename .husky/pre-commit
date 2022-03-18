@@ -1,4 +1,36 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+echo '👷👷👷 Testing project before committing... 👷👷👷'
+yarn husky:check-lint ||
+(
+        echo '😤😤 ESLint Check Failed! 😤😤 
+                ESLint Check Failed. Make the required changes listed above, add changes and try to commit again.'
+        false; 
+)
 
+yarn husky:check-format ||
+(
+    echo '🤢🤢 Styling Check Failed! 🤢🤢
+            Prettier Check Failed. Run npm run format, add changes and try commit again.';
+    false;
+)
+
+yarn husky:check-types ||
+(
+    echo '❌❌ Failed Type check! ❌❌
+            Incorrect Types. Make the changes required above.'
+    false;
+)
+
+echo '🤔🤔🤔 Code looks good... Trying to build now. 🤔🤔🤔'
+
+yarn build ||
+(
+    echo '👷👷 Build Failed! 👷👷
+            Next build failed: View the errors above to see why. 
+    '
+    false;
+)
+
+echo '✅✅✅✅ Looks good... I am committing this now. ✅✅✅✅'
