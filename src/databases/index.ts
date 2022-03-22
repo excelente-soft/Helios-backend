@@ -1,33 +1,24 @@
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from '@config';
-import Sequelize from 'sequelize';
+import { DataSource } from 'typeorm';
+import { User } from '@models/user.model';
+import { Token } from '@models/token.model';
 
-const sequelize = new Sequelize.Sequelize(DB_DATABASE, DB_USER, DB_PASSWORD, {
-  dialect: 'postgres',
+import 'reflect-metadata';
+
+export default new DataSource({
+  type: 'postgres',
   host: DB_HOST,
   port: +DB_PORT,
-  define: {
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_general_ci',
-    underscored: true,
-    freezeTableName: true,
-  },
-  pool: {
-    min: 0,
-    max: 5,
-  },
-  dialectOptions: {
+  username: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  entities: [User, Token],
+  synchronize: true,
+  logging: false,
+  ssl: true,
+  extra: {
     ssl: {
-      require: true,
       rejectUnauthorized: false,
     },
   },
 });
-
-sequelize.authenticate();
-
-const DB = {
-  sequelize, // connection instance (RAW queries)
-  Sequelize, // library
-};
-
-export default DB;
