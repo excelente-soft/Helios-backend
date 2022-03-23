@@ -3,7 +3,7 @@ import { User } from '@models/user.model';
 
 @Entity()
 export class Token {
-  @PrimaryColumn()
+  @PrimaryColumn({ unique: true })
   userId: string;
 
   @OneToOne(() => User, (user) => user.id)

@@ -14,4 +14,8 @@ export const {
   DB_USER = 'postgres',
   DB_PASSWORD = 'admin',
   DB_DATABASE = 'dev',
+  CLOUDINARY_NAME = 'Helios',
+  CLOUDINARY_API_KEY = '123456789',
+  CLOUDINARY_API_SECRET = 'null',
+  CLOUDINARY_UPLOAD_PRESET = 'Helios-images',
 } = process.env;

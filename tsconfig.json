@@ -12,7 +12,8 @@
       "@routes/*": ["routes/*"],
       "@utils/*": ["utils/*"],
       "@services/*": ["services/*"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@transforms/*": ["transforms/*"]
     },
     "pretty": true,
     "allowJs": true,
