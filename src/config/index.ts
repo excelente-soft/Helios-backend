@@ -18,4 +18,5 @@ export const {
   CLOUDINARY_API_KEY = '123456789',
   CLOUDINARY_API_SECRET = 'null',
   CLOUDINARY_UPLOAD_PRESET = 'Helios-images',
+  CLIENT_URL = 'http://localhost:3000',
 } = process.env;

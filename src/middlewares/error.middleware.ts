@@ -7,6 +7,7 @@ export const errorMiddleware = (err: Error | ControlledException, req: Request, 
   if (err instanceof ControlledException) {
     return sendToClient(res, null, err.message, err.code);
   }
+
   console.log(err.message);
   return sendToClient(res, null, 'Internal server error', StatusCode.INTERNAL_SERVER_ERROR);
 };

@@ -32,6 +32,31 @@ const Schemas = {
   RefreshTokenSchema: Joi.object({
     refreshToken: Joi.string().min(35).required(),
   }),
+  ChangeProfileSchema: Joi.object({
+    name: Joi.string().pattern(notSpecialSymbol).min(2).max(24).required(),
+    secondName: Joi.string().pattern(notSpecialSymbol).min(2).max(24).required(),
+    nickname: Joi.string().pattern(notSpecialSymbol).pattern(nicknameRegExp).min(2).max(24).required(),
+  }),
+  ChangeEmailSchema: Joi.object({
+    email: Joi.string().min(3).max(64).email().required(),
+    password: Joi.string().pattern(notSpaceRegExp).pattern(passwordRegExp).min(6).max(36).required(),
+  }),
+  ChangePasswordSchema: Joi.object({
+    currentPassword: Joi.string().pattern(notSpaceRegExp).pattern(passwordRegExp).min(6).max(36).required(),
+    newPassword: Joi.string()
+      .pattern(notSpaceRegExp)
+      .pattern(passwordRegExp)
+      .min(6)
+      .max(36)
+      .disallow(Joi.ref('currentPassword'))
+      .required(),
+  }),
+  ChangeTypeSchema: Joi.object({
+    type: Joi.string().valid('public', 'private').required(),
+  }),
+  ChangeAvatarSchema: Joi.object({
+    avatar: Joi.string().required(),
+  }),
 };
 
 export const validateBody = (data: unknown, schema: keyof typeof Schemas) => {

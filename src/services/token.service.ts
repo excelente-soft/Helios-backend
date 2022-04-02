@@ -24,11 +24,6 @@ export const saveRefreshToken = async (userId: string, refreshToken: string) => 
   return token;
 };
 
-export const deleteRefreshToken = async (refreshToken: string) => {
-  await DB.manager.delete(Token, { refreshToken });
-  return refreshToken;
-};
-
 export const validateAccessToken = (accessToken: string) => {
   try {
     const userData = verify(accessToken, ACCESS_TOKEN_SECRET) as ITokenPayload;

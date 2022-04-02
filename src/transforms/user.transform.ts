@@ -11,6 +11,7 @@ export const userAuthTransform = (tokens: { refreshToken: string; accessToken: s
       email: user.email,
       token: tokens.accessToken,
       avatar: user.avatar,
+      type: user.type,
       role: {
         roleName: role.roleName,
         color: role.color,

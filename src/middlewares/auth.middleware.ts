@@ -7,7 +7,7 @@ export const authMiddleware = async (req: Request, _: Response, next: NextFuncti
   try {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
-      throw new ControlledException('Invalid token', StatusCode.UNAUTHORIZED);
+      throw new ControlledException('Invalid token1', StatusCode.UNAUTHORIZED);
     }
     const accessToken = authorizationHeader.split(' ')[1];
     if (!accessToken) {
@@ -20,6 +20,6 @@ export const authMiddleware = async (req: Request, _: Response, next: NextFuncti
     req.user = userId;
     next();
   } catch (err) {
-    throw new ControlledException('Invalid token', StatusCode.UNAUTHORIZED);
+    next(err);
   }
 };
