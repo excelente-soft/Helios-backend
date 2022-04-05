@@ -14,6 +14,7 @@ import express from 'express';
 import { CLIENT_URL, PORT, VERSION } from '@config';
 import authRoutes from '@routes/auth.route';
 import userRoutes from '@routes/user.route';
+import courseRoutes from '@routes/course.route';
 import compression from 'compression';
 import { errorMiddleware } from '@middlewares/error.middleware';
 import cors from 'cors';
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: 15 * 1024 * 1024 }));
 app.use(path, authRoutes);
 app.use(path, userRoutes);
+app.use(path, courseRoutes);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
