@@ -5,15 +5,15 @@
     "baseUrl": "src",
     "paths": {
       "@config": ["config/index.ts"],
-      "@controllers/*": ["controllers/*"],
+      "@services": ["services/index.ts"],
+      "@utils": ["utils/index.ts"],
+      "@transforms": ["transforms/index.ts"],
+      "@routes": ["routes/index.ts"],
+      "@controllers": ["controllers/index.ts"],
+      "@middlewares/*": ["middlewares/*"],
       "@databases": ["databases"],
       "@interfaces/*": ["interfaces/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@routes/*": ["routes/*"],
-      "@utils/*": ["utils/*"],
-      "@services/*": ["services/*"],
-      "@models/*": ["models/*"],
-      "@transforms/*": ["transforms/*"]
+      "@models/*": ["models/*"]
     },
     "pretty": true,
     "allowJs": true,

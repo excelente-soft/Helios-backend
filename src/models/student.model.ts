@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Course } from '@models/course.model';
-import { Grade } from '@models/grade.model';
-import { User } from '@models/user.model';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
+
+import { Course } from './course.model';
+import { Grade } from './grade.model';
+import { User } from './user.model';
 
 @Entity()
 export class Student {
@@ -12,9 +13,15 @@ export class Student {
   @JoinColumn()
   user: User;
 
+  @Column()
+  userId: string;
+
   @ManyToOne(() => Course)
   @JoinColumn()
   course: Course;
+
+  @Column()
+  courseId: string;
 
   @OneToMany(() => Grade, (grade) => grade.student)
   grades: Grade[];

@@ -3,3 +3,8 @@ export interface ITokenPayload {
   iat: number;
   exp: number;
 }
+
+export interface IPairTokens {
+  accessToken: string;
+  refreshToken: string;
+}

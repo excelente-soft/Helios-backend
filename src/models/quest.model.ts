@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Answer } from '@models/answer.model';
-import { Test } from '@models/test.model';
+
+import { Answer } from './answer.model';
+import { Test } from './test.model';
 
 @Entity()
 export class Quest {
@@ -10,8 +11,11 @@ export class Quest {
   @Column()
   question: string;
 
-  @ManyToOne(() => Test, (Test) => Test.quests)
+  @ManyToOne(() => Test, (Test) => Test.quests, { onDelete: 'CASCADE' })
   test: string;
+
+  @Column()
+  testId: string;
 
   @OneToMany(() => Answer, (answer) => answer.quest)
   answers: Answer[];

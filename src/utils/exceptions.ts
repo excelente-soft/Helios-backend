@@ -1,6 +1,6 @@
 import { StatusCode } from '@interfaces/status.interface';
 
-export class ControlledException {
+class ControlledException {
   message: string;
   code: StatusCode;
 
@@ -9,3 +9,7 @@ export class ControlledException {
     this.code = code;
   }
 }
+
+export default {
+  ControlledException,
+};

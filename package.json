@@ -19,6 +19,7 @@
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/compression": "^1.7.2",
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",

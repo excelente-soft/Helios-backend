@@ -1,59 +1,67 @@
-import { changeEmail, changeProfile, changePassword, changeType, changeAvatar } from '@services/user.service';
-import { validateBody } from '@utils/joiSchamas';
-import { sendToClient } from '@utils/sender';
 import { NextFunction, Request, Response } from 'express';
 
-export const changeProfileController = async (req: Request, res: Response, next: NextFunction) => {
+import { Services } from '@services';
+import { Utils } from '@utils';
+
+const changeProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, secondName, nickname } = req.body;
-    validateBody({ name, secondName, nickname }, 'ChangeProfileSchema');
-    const changedUser = await changeProfile(req.user || '', name, secondName, nickname);
-    return sendToClient(res, changedUser);
+    Utils.Validator.validateBody({ name, secondName, nickname }, 'ChangeProfileSchema');
+    const changedUser = await Services.User.changeProfile(req.user || '', name, secondName, nickname);
+    return Utils.Sender.sendToClient(res, changedUser);
   } catch (err) {
     next(err);
   }
 };
 
-export const changeEmailController = async (req: Request, res: Response, next: NextFunction) => {
+const changeEmail = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
-    validateBody({ email, password }, 'ChangeEmailSchema');
-    const changedUser = await changeEmail(req.user || '', email, password);
-    return sendToClient(res, changedUser);
+    Utils.Validator.validateBody({ email, password }, 'ChangeEmailSchema');
+    const changedUser = await Services.User.changeEmail(req.user || '', email, password);
+    return Utils.Sender.sendToClient(res, changedUser);
   } catch (err) {
     next(err);
   }
 };
 
-export const changePasswordController = async (req: Request, res: Response, next: NextFunction) => {
+const changePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    validateBody({ currentPassword, newPassword }, 'ChangePasswordSchema');
-    const changedUser = await changePassword(req.user || '', currentPassword, newPassword);
-    return sendToClient(res, changedUser);
+    Utils.Validator.validateBody({ currentPassword, newPassword }, 'ChangePasswordSchema');
+    const changedUser = await Services.User.changePassword(req.user || '', currentPassword, newPassword);
+    return Utils.Sender.sendToClient(res, changedUser);
   } catch (err) {
     next(err);
   }
 };
 
-export const changeTypeController = async (req: Request, res: Response, next: NextFunction) => {
+const changeType = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { type } = req.body;
-    validateBody({ type }, 'ChangeTypeSchema');
-    const changedUser = await changeType(req.user || '', type);
-    return sendToClient(res, changedUser);
+    Utils.Validator.validateBody({ type }, 'ChangeTypeSchema');
+    const changedUser = await Services.User.changeType(req.user || '', type);
+    return Utils.Sender.sendToClient(res, changedUser);
   } catch (err) {
     next(err);
   }
 };
 
-export const changeAvatarController = async (req: Request, res: Response, next: NextFunction) => {
+const changeAvatar = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { avatar } = req.body;
-    validateBody({ avatar }, 'ChangeAvatarSchema');
-    const changedUser = await changeAvatar(req.user || '', avatar);
-    return sendToClient(res, changedUser);
+    Utils.Validator.validateBody({ avatar }, 'ChangeAvatarSchema');
+    const changedUser = await Services.User.changeAvatar(req.user || '', avatar);
+    return Utils.Sender.sendToClient(res, changedUser);
   } catch (err) {
     next(err);
   }
+};
+
+export default {
+  changeProfile,
+  changeEmail,
+  changePassword,
+  changeType,
+  changeAvatar,
 };

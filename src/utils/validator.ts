@@ -1,6 +1,8 @@
 import Joi from 'joi';
-import { ControlledException } from '@utils/exceptions';
+
 import { StatusCode } from '@interfaces/status.interface';
+
+import ExceptionsUtility from './exceptions';
 
 const nicknameRegExp = /^[A-Za-z0-9_]+$/;
 const nicknameOrEmail = /^[A-Za-z0-9_.@]+$/;
@@ -57,11 +59,64 @@ const Schemas = {
   ChangeAvatarSchema: Joi.object({
     avatar: Joi.string().required(),
   }),
+  CreateRoleSchema: Joi.object({
+    accessLevel: Joi.number().integer().min(0).max(10).required(),
+    color: Joi.string().pattern(notSpaceRegExp).min(2).max(10).required(),
+    roleName: Joi.string().min(2).max(24).required(),
+  }),
+  CreateCourseSchema: Joi.object({
+    name: Joi.string().min(6).max(64).required(),
+    shortDescription: Joi.string().min(6).max(64).required(),
+    description: Joi.string().min(16).max(1024).required(),
+    image: Joi.string().required(),
+    price: Joi.number().min(0).max(100000).required(),
+  }),
+  CourseNameSchema: Joi.object({
+    name: Joi.string().min(6).max(64).required(),
+  }),
+  CourseIdSchema: Joi.object({
+    courseId: Joi.string().required(),
+  }),
+  ChangeCourseSchema: Joi.object({
+    id: Joi.string().required(),
+    name: Joi.string().min(6).max(64).required(),
+    shortDescription: Joi.string().min(6).max(64).required(),
+    description: Joi.string().min(16).max(1024).required(),
+    image: Joi.string().required(),
+    price: Joi.number().min(0).max(100000).required(),
+    targetAccessLevel: Joi.number().integer().min(0).max(10).required(),
+  }),
+  ChangeLectureSchema: Joi.object({
+    id: Joi.string().required(),
+    text: Joi.string().min(6).max(17280).required(),
+    name: Joi.string().min(3).required(),
+  }),
+  IdSchema: Joi.object({
+    id: Joi.string().required(),
+  }),
+  ChangeTestNameSchema: Joi.object({
+    id: Joi.string().required(),
+    name: Joi.string().min(3).required(),
+  }),
+  testIdSchema: Joi.object({
+    testId: Joi.string().required(),
+  }),
+  ChangeQuestSchema: Joi.object({
+    id: Joi.string().required(),
+    question: Joi.string().min(1).max(1024).required(),
+  }),
+  ChangeAnswerSchema: Joi.object({
+    id: Joi.string().required(),
+    answer: Joi.string().min(1).max(1024).required(),
+    isCorrect: Joi.boolean().required(),
+  }),
 };
 
-export const validateBody = (data: unknown, schema: keyof typeof Schemas) => {
+const validateBody = (data: unknown, schema: keyof typeof Schemas) => {
   const validatedData = Schemas[schema].validate(data);
   if (validatedData.error) {
-    throw new ControlledException(validatedData.error.details[0].message, StatusCode.BAD_REQUEST);
+    throw new ExceptionsUtility.ControlledException(validatedData.error.details[0].message, StatusCode.BAD_REQUEST);
   }
 };
+
+export default { validateBody };

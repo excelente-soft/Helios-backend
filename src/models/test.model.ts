@@ -1,6 +1,7 @@
 import { Entity, Column, JoinColumn, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Course } from '@models/course.model';
-import { Quest } from '@models/quest.model';
+
+import { Course } from './course.model';
+import { Quest } from './quest.model';
 
 @Entity()
 export class Test {
@@ -10,13 +11,19 @@ export class Test {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column({ default: 'test', update: false })
+  type: string;
+
+  @Column()
   position: number;
+
+  @Column()
+  courseId: string;
 
   @OneToMany(() => Quest, (quest) => quest.test)
   quests: Quest[];
 
-  @ManyToOne(() => Course)
+  @ManyToOne(() => Course, (course) => course.id)
   @JoinColumn()
   course: Course;
 }

@@ -1,10 +1,11 @@
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TIME, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TIME } from '@config';
-import { Token } from '@models/token.model';
-import DB from '@databases';
 import { sign, verify } from 'jsonwebtoken';
-import { ITokenPayload } from '@interfaces/token.interface';
 
-export const generateTokens = (id: string) => {
+import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_TIME, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_TIME } from '@config';
+import { DB } from '@databases';
+import { ITokenPayload } from '@interfaces/token.interface';
+import { Token } from '@models/token.model';
+
+const generateTokensById = (id: string) => {
   const accessToken = sign({ id }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_TIME,
   });
@@ -14,7 +15,7 @@ export const generateTokens = (id: string) => {
   return { accessToken, refreshToken };
 };
 
-export const saveRefreshToken = async (userId: string, refreshToken: string) => {
+const saveRefreshToken = async (userId: string, refreshToken: string) => {
   const existToken = await DB.manager.findOneBy(Token, { userId });
   if (existToken) {
     existToken.refreshToken = refreshToken;
@@ -24,7 +25,7 @@ export const saveRefreshToken = async (userId: string, refreshToken: string) => 
   return token;
 };
 
-export const validateAccessToken = (accessToken: string) => {
+const validateAccessToken = (accessToken: string) => {
   try {
     const userData = verify(accessToken, ACCESS_TOKEN_SECRET) as ITokenPayload;
     return userData.id;
@@ -33,7 +34,7 @@ export const validateAccessToken = (accessToken: string) => {
   }
 };
 
-export const validateRefreshToken = (refreshToken: string) => {
+const validateRefreshToken = (refreshToken: string) => {
   try {
     const userData = verify(refreshToken, REFRESH_TOKEN_SECRET) as ITokenPayload;
     return userData.id;
@@ -42,7 +43,15 @@ export const validateRefreshToken = (refreshToken: string) => {
   }
 };
 
-export const findToken = async (refreshToken: string) => {
+const findToken = async (refreshToken: string) => {
   const tokenData = await DB.manager.findOneBy(Token, { refreshToken });
   return tokenData;
+};
+
+export default {
+  generateTokensById,
+  saveRefreshToken,
+  validateAccessToken,
+  validateRefreshToken,
+  findToken,
 };

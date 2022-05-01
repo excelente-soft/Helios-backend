@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Quest } from '@models/quest.model';
+
+import { Quest } from './quest.model';
 
 @Entity()
 export class Answer {
@@ -12,6 +13,9 @@ export class Answer {
   @Column()
   isCorrect: boolean;
 
-  @ManyToOne(() => Quest, (Quest) => Quest.answers)
+  @Column()
+  questId: string;
+
+  @ManyToOne(() => Quest, (Quest) => Quest.answers, { onDelete: 'CASCADE' })
   quest: string;
 }

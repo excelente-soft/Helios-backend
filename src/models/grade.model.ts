@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Student } from '@models/student.model';
+
+import { Student } from './student.model';
 
 @Entity()
 export class Grade {

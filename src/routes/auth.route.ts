@@ -1,11 +1,13 @@
-import { loginController, signupController, validateController, refreshController } from '@controllers/auth.controller';
 import express from 'express';
+
+import { Controllers } from '@controllers';
 
 const router = express.Router();
 
-router.post('/login', loginController);
-router.post('/signup', signupController);
-router.post('/validate', validateController);
-router.post('/refresh', refreshController);
+router.post('/login', Controllers.Auth.login);
+router.post('/signup', Controllers.Auth.signup);
+router.post('/validate', Controllers.Auth.validate);
+router.post('/refresh', Controllers.Auth.refresh);
 
 export default router;
+

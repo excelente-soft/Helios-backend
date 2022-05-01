@@ -1,17 +1,16 @@
-import { User } from '@models/user.model';
-import DB from '@databases';
-import { generateHash } from '@utils/sha256';
-import { generateTokens, saveRefreshToken } from '@services/token.service';
-import { findToken, validateRefreshToken } from '@services/token.service';
-import { ControlledException } from '@utils/exceptions';
+import { DB } from '@databases';
+import { UserType } from '@interfaces/role.interface';
 import { StatusCode } from '@interfaces/status.interface';
-import { userAuthTransform } from '@transforms/user.transform';
-import { findRoleByAccessLevel } from '@services/roles.service';
-import { UserType } from '../interfaces/role.interface';
-import { uploadAvatar } from './cloudinary.service';
+import { User } from '@models/user.model';
+import { Transforms } from '@transforms';
+import { Utils } from '@utils';
 
-export const auth = async (login: string, password: string) => {
-  const hashedPassword = generateHash(password);
+import CloudinaryService from './cloudinary.service';
+import RoleService from './role.service';
+import TokenService from './token.service';
+
+const auth = async (login: string, password: string) => {
+  const hashedPassword = Utils.Crypt.generateHash(password);
   const user = await DB.manager.findOne(User, {
     where: [
       { password: hashedPassword, email: login },
@@ -20,47 +19,52 @@ export const auth = async (login: string, password: string) => {
     relations: { role: true },
   });
   if (!user) {
-    throw new ControlledException('Invalid email or password', StatusCode.UNAUTHORIZED);
+    throw new Utils.Exceptions.ControlledException('Invalid email or password', StatusCode.UNAUTHORIZED);
   }
-  const tokens = generateTokens(user.id);
-  await saveRefreshToken(user.id, tokens.refreshToken);
-  return userAuthTransform(tokens, user, user.role);
+  const tokens = TokenService.generateTokensById(user.id);
+  await TokenService.saveRefreshToken(user.id, tokens.refreshToken);
+  return Transforms.User.userAuth(tokens, user, user.role);
 };
 
-export const signup = async (name: string, secondName: string, nickname: string, email: string, password: string) => {
-  const defaultRole = await findRoleByAccessLevel(0);
+const signup = async (name: string, secondName: string, nickname: string, email: string, password: string) => {
+  const defaultRole = await RoleService.findRoleByAccessLevel(0);
   const isUserExists = await DB.manager.findOneBy(User, [{ nickname }, { email }]);
-  if (isUserExists) throw new ControlledException('An account with this email or nickname already exists.');
+  if (isUserExists) {
+    throw new Utils.Exceptions.ControlledException('An account with this email or nickname already exists.');
+  }
   const user = await DB.manager.save(User, {
     name,
     secondName,
     nickname,
     email,
-    password: generateHash(password),
+    password: Utils.Crypt.generateHash(password),
     roleId: defaultRole.id,
   });
-  const tokens = generateTokens(user.id);
-  await saveRefreshToken(user.id, tokens.refreshToken);
-  return userAuthTransform(tokens, user, defaultRole);
+  const tokens = TokenService.generateTokensById(user.id);
+  await TokenService.saveRefreshToken(user.id, tokens.refreshToken);
+  return Transforms.User.userAuth(tokens, user, defaultRole);
 };
 
-export const refresh = async (refreshToken: string) => {
-  const userId = validateRefreshToken(refreshToken);
-  const tokenFromDB = await findToken(refreshToken);
+const refresh = async (refreshToken: string) => {
+  const userId = TokenService.validateRefreshToken(refreshToken);
+  const tokenFromDB = await TokenService.findToken(refreshToken);
   if (!userId || !tokenFromDB) {
-    throw new ControlledException('Incorrect token', StatusCode.UNAUTHORIZED);
+    throw new Utils.Exceptions.ControlledException('Incorrect token', StatusCode.UNAUTHORIZED);
   }
   const user = await DB.manager.findOneOrFail(User, { where: { id: userId }, relations: { role: true } });
-  const tokens = generateTokens(userId);
-  await saveRefreshToken(userId, tokens.refreshToken);
-  return userAuthTransform(tokens, user, user.role);
+  const tokens = TokenService.generateTokensById(userId);
+  await TokenService.saveRefreshToken(userId, tokens.refreshToken);
+  return Transforms.User.userAuth(tokens, user, user.role);
 };
 
-export const changeProfile = async (id: string, name: string, secondName: string, nickname: string) => {
+const changeProfile = async (id: string, name: string, secondName: string, nickname: string) => {
   const user = await DB.manager.findOneByOrFail(User, { id });
   const anotherUserWithNickname = await DB.manager.findOneBy(User, { nickname });
   if (anotherUserWithNickname && user.id !== anotherUserWithNickname.id) {
-    throw new ControlledException('The chosen nickname is already used by someone', StatusCode.CONFLICT);
+    throw new Utils.Exceptions.ControlledException(
+      'The chosen nickname is already used by someone',
+      StatusCode.CONFLICT,
+    );
   }
   const changedProfileResult = await DB.createQueryBuilder()
     .update(User)
@@ -75,14 +79,14 @@ export const changeProfile = async (id: string, name: string, secondName: string
   };
 };
 
-export const changeEmail = async (id: string, email: string, password: string) => {
+const changeEmail = async (id: string, email: string, password: string) => {
   const user = await DB.manager.findOneByOrFail(User, { id });
-  if (user.password !== generateHash(password)) {
-    throw new ControlledException('Incorrect current password', StatusCode.NOT_FOUND);
+  if (user.password !== Utils.Crypt.generateHash(password)) {
+    throw new Utils.Exceptions.ControlledException('Incorrect current password', StatusCode.NOT_FOUND);
   }
   const anotherUserWithEmail = await DB.manager.findOneBy(User, { email });
   if (anotherUserWithEmail && user.id !== anotherUserWithEmail.id) {
-    throw new ControlledException('This email is already used by someone', StatusCode.CONFLICT);
+    throw new Utils.Exceptions.ControlledException('This email is already used by someone', StatusCode.CONFLICT);
   }
   const changedEmailResult = await DB.createQueryBuilder()
     .update(User)
@@ -93,20 +97,20 @@ export const changeEmail = async (id: string, email: string, password: string) =
   return { email: changedEmailResult.raw[0].email };
 };
 
-export const changePassword = async (id: string, password: string, newPassword: string) => {
+const changePassword = async (id: string, password: string, newPassword: string) => {
   const changedPasswordResult = await DB.createQueryBuilder()
     .update(User)
-    .set({ password: generateHash(newPassword) })
-    .where({ id, password: generateHash(password) })
+    .set({ password: Utils.Crypt.generateHash(newPassword) })
+    .where({ id, password: Utils.Crypt.generateHash(password) })
     .returning(['password'])
     .execute();
   if (changedPasswordResult.affected === 0) {
-    throw new ControlledException('Incorrect current password', StatusCode.NOT_FOUND);
+    throw new Utils.Exceptions.ControlledException('Incorrect current password', StatusCode.NOT_FOUND);
   }
   return { password: true };
 };
 
-export const changeType = async (id: string, type: UserType) => {
+const changeType = async (id: string, type: UserType) => {
   const changedTypeResult = await DB.createQueryBuilder()
     .update(User)
     .set({ type })
@@ -116,7 +120,7 @@ export const changeType = async (id: string, type: UserType) => {
   return { type: changedTypeResult.raw[0].type };
 };
 
-export const changeAvatar = async (id: string, avatar: string) => {
+const changeAvatar = async (id: string, avatar: string) => {
   if (avatar === 'default') {
     const changedAvatarResult = await DB.createQueryBuilder()
       .update(User)
@@ -128,7 +132,7 @@ export const changeAvatar = async (id: string, avatar: string) => {
       .execute();
     return { avatar: changedAvatarResult.raw[0].avatar };
   } else {
-    const cloudinaryUploadResult = await uploadAvatar(avatar);
+    const cloudinaryUploadResult = await CloudinaryService.uploadImage(avatar);
     const changedAvatarResult = await DB.createQueryBuilder()
       .update(User)
       .set({ avatar: cloudinaryUploadResult.secure_url })
@@ -137,4 +141,15 @@ export const changeAvatar = async (id: string, avatar: string) => {
       .execute();
     return { avatar: changedAvatarResult.raw[0].avatar };
   }
+};
+
+export default {
+  auth,
+  signup,
+  refresh,
+  changeProfile,
+  changeEmail,
+  changePassword,
+  changeType,
+  changeAvatar,
 };

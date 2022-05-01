@@ -1,26 +1,32 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Course } from './course.model';
 
 @Entity()
-export class Lecture {
+export class Practice {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   name: string;
 
-  @Column({ default: 'lecture', update: false })
-  type: string;
+  @Column()
+  objective: string;
+
+  @Column({ default: 'none' })
+  objectiveType: string;
 
   @Column()
-  text: string;
+  link: string;
 
   @Column()
   position: number;
 
   @Column()
   courseId: string;
+
+  @Column({ default: 'practice', update: false })
+  type: string;
 
   @ManyToOne(() => Course, (course) => course.id)
   @JoinColumn()

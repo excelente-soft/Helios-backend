@@ -10,15 +10,14 @@
     Project initialized: Mar 17, 2022
     
  */
-import express from 'express';
-import { CLIENT_URL, PORT, VERSION } from '@config';
-import authRoutes from '@routes/auth.route';
-import userRoutes from '@routes/user.route';
-import courseRoutes from '@routes/course.route';
 import compression from 'compression';
-import { errorMiddleware } from '@middlewares/error.middleware';
 import cors from 'cors';
-import DB from '@databases';
+import express from 'express';
+
+import { CLIENT_URL, PORT, VERSION } from '@config';
+import { DB } from '@databases';
+import { errorMiddleware } from '@middlewares/error.middleware';
+import { Routes } from '@routes';
 
 const app = express();
 const path = `/v${VERSION}/api`;
@@ -28,11 +27,10 @@ app.use(cors({ credentials: true, origin: CLIENT_URL }));
 app.use(compression({ level: 9, threshold: 420 * 1024 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: 15 * 1024 * 1024 }));
-app.use(path, authRoutes);
-app.use(path, userRoutes);
-app.use(path, courseRoutes);
+app.use(path, Routes.Auth, Routes.User, Routes.Course, Routes.Role, Routes.Task);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server started at http://localhost:${PORT}${path}`);
 });
+
