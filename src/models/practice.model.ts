@@ -1,6 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ObjectiveType, TaskType } from '@interfaces/task.interface';
 
 import { Course } from './course.model';
+import { Feedback } from './feedback.model';
 
 @Entity()
 export class Practice {
@@ -13,8 +15,8 @@ export class Practice {
   @Column()
   objective: string;
 
-  @Column({ default: 'none' })
-  objectiveType: string;
+  @Column({ default: ObjectiveType.none, enum: ObjectiveType })
+  objectiveType: ObjectiveType;
 
   @Column()
   link: string;
@@ -25,8 +27,11 @@ export class Practice {
   @Column()
   courseId: string;
 
-  @Column({ default: 'practice', update: false })
-  type: string;
+  @OneToMany(() => Feedback, (feedback) => feedback.practice)
+  quests: Feedback[];
+
+  @Column({ default: TaskType.practice, enum:TaskType.practice, update: false })
+  type: TaskType.practice;
 
   @ManyToOne(() => Course, (course) => course.id)
   @JoinColumn()

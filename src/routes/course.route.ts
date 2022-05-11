@@ -14,5 +14,6 @@ router.get('/my-courses', authMiddleware, Controllers.Course.userCourses);
 router.get('/courses-to-manage', authMiddleware, adminMiddleware, Controllers.Course.coursesToManage);
 router.get('/course-management/:courseId', authMiddleware, adminMiddleware, Controllers.Course.courseToManage);
 router.put('/change-course', authMiddleware, adminMiddleware, Controllers.Course.changeCourse);
+router.get('/study/course/:courseName', authMiddleware, Controllers.Course.courseProgress);
 
 export default router;

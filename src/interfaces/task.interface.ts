@@ -3,5 +3,26 @@ export interface ITask {
   name: string;
   position: number;
   courseId: string;
-  type: 'lecture' | 'test';
+  type: TaskType;
+}
+
+export enum TaskType {
+  lecture = 'lecture',
+  test = 'test',
+  practice = 'practice',
+}
+
+export enum ObjectiveType {
+  none = 'none',
+  figma = 'figma',
+  codesandbox = 'codesandbox',
+}
+
+export interface IUserAnswer {
+  questId: string;
+  answersId: string[];
+}
+
+export interface IAnswerTree {
+  [key: string]: IUserAnswer;
 }

@@ -58,10 +58,33 @@ const changeAvatar = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+const myRole = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { avatar, email, name, nickname, secondName, type } = req.body;
+    Utils.Validator.validateBody({ avatar, email, name, nickname, secondName, type }, 'UserRoleSchema');
+    const userRole = await Services.User.userRole(req.user || '', avatar, email, name, nickname, secondName, type);
+    return Utils.Sender.sendToClient(res, userRole);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const userProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { nickname } = req.params;
+    const userProfile = await Services.User.userProfile(nickname);
+    return Utils.Sender.sendToClient(res, userProfile);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   changeProfile,
   changeEmail,
   changePassword,
   changeType,
   changeAvatar,
+  myRole,
+  userProfile,
 };

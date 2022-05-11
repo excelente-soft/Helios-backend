@@ -1,6 +1,13 @@
-import { ICourseManage } from '@interfaces/course.interface';
+import { Student } from '../models/student.model';
 
-const courseManage = (courseToManage: ICourseManage) => {
+import { ICourseManage, IUserCourse } from '@interfaces/course.interface';
+import { ITask } from '@interfaces/task.interface';
+
+const toTasks = (tasks: ITask[]) => {
+  return tasks.map(({ id, name, position, courseId, type }) => ({ id, name, position, courseId, type }));
+};
+
+const toCourseManage = (courseToManage: ICourseManage) => {
   const {
     id,
     creationDate,
@@ -23,6 +30,28 @@ const courseManage = (courseToManage: ICourseManage) => {
   };
 };
 
+const toUserCourses = (studentCourses: IUserCourse[]) => {
+  return studentCourses.map((course) => {
+    const { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel, progress } =
+      course;
+    return { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel, progress };
+  });
+};
+
+const toCourseProgress = (studentCourses: Student) => {
+  const { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel } =
+    studentCourses.course;
+  return {
+    course: { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel },
+    grades: studentCourses.grades,
+    tests: toTasks(studentCourses.course.tests),
+    lectures: toTasks(studentCourses.course.lectures),
+    practices: toTasks(studentCourses.course.practices),
+  };
+};
+
 export default {
-  courseManage,
+  toCourseManage,
+  toUserCourses,
+  toCourseProgress,
 };

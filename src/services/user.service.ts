@@ -9,6 +9,25 @@ import CloudinaryService from './cloudinary.service';
 import RoleService from './role.service';
 import TokenService from './token.service';
 
+const userRole = async (
+  userId: string,
+  avatar: string,
+  email: string,
+  name: string,
+  nickname: string,
+  secondName: string,
+  type: UserType,
+) => {
+  const user = await DB.manager.findOne(User, {
+    where: { id: userId, avatar, email, name, nickname, secondName, type },
+    relations: { role: true },
+  });
+  if (!user) {
+    throw new Utils.Exceptions.ControlledException('User not found', StatusCode.UNAUTHORIZED);
+  }
+  return Transforms.User.toUserRole(user.role);
+};
+
 const auth = async (login: string, password: string) => {
   const hashedPassword = Utils.Crypt.generateHash(password);
   const user = await DB.manager.findOne(User, {
@@ -23,7 +42,7 @@ const auth = async (login: string, password: string) => {
   }
   const tokens = TokenService.generateTokensById(user.id);
   await TokenService.saveRefreshToken(user.id, tokens.refreshToken);
-  return Transforms.User.userAuth(tokens, user, user.role);
+  return Transforms.User.toUserAuth(tokens, user, user.role);
 };
 
 const signup = async (name: string, secondName: string, nickname: string, email: string, password: string) => {
@@ -42,7 +61,7 @@ const signup = async (name: string, secondName: string, nickname: string, email:
   });
   const tokens = TokenService.generateTokensById(user.id);
   await TokenService.saveRefreshToken(user.id, tokens.refreshToken);
-  return Transforms.User.userAuth(tokens, user, defaultRole);
+  return Transforms.User.toUserAuth(tokens, user, defaultRole);
 };
 
 const refresh = async (refreshToken: string) => {
@@ -54,7 +73,7 @@ const refresh = async (refreshToken: string) => {
   const user = await DB.manager.findOneOrFail(User, { where: { id: userId }, relations: { role: true } });
   const tokens = TokenService.generateTokensById(userId);
   await TokenService.saveRefreshToken(userId, tokens.refreshToken);
-  return Transforms.User.userAuth(tokens, user, user.role);
+  return Transforms.User.toUserAuth(tokens, user, user.role);
 };
 
 const changeProfile = async (id: string, name: string, secondName: string, nickname: string) => {
@@ -107,7 +126,7 @@ const changePassword = async (id: string, password: string, newPassword: string)
   if (changedPasswordResult.affected === 0) {
     throw new Utils.Exceptions.ControlledException('Incorrect current password', StatusCode.NOT_FOUND);
   }
-  return { password: true };
+  return true;
 };
 
 const changeType = async (id: string, type: UserType) => {
@@ -143,6 +162,17 @@ const changeAvatar = async (id: string, avatar: string) => {
   }
 };
 
+const userProfile = (nickname: string) => {
+  return DB.manager.findOne(User, {
+    where: {
+      nickname,
+      type: UserType.Public,
+    },
+    relations: ['role'],
+    select: ['id', 'name', 'secondName', 'nickname', 'avatar', 'type', 'email'],
+  });
+};
+
 export default {
   auth,
   signup,
@@ -152,4 +182,6 @@ export default {
   changePassword,
   changeType,
   changeAvatar,
+  userRole,
+  userProfile,
 };

@@ -22,8 +22,8 @@ const createRole = async (userAccessLevel: number, accessLevel: number, color: s
       throw new Utils.Exceptions.ControlledException('A role with this color already exists', StatusCode.FORBIDDEN);
     }
   }
-  const role = await DB.manager.save(Role, { accessLevel, color, roleName });
-  return role;
+  await DB.manager.save(Role, { accessLevel, color, roleName });
+  return true;
 };
 
 const findRoleByAccessLevel = async (accessLevel: number) => {

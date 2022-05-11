@@ -1,8 +1,10 @@
+import { ITask } from '../interfaces/task.interface';
+
 import { LessThanOrEqual } from 'typeorm';
 
 import { DB } from '@databases';
-import { IChangeCourse, ICreateCourse } from '@interfaces/course.interface';
-import { IModal } from '@interfaces/modal.interface';
+import { IChangeCourse, ICreateCourse, IUserCourse } from '@interfaces/course.interface';
+import { IModal, ModalType } from '@interfaces/modal.interface';
 import { StatusCode } from '@interfaces/status.interface';
 import { Course } from '@models/course.model';
 import { Student } from '@models/student.model';
@@ -26,13 +28,13 @@ const createCourse = async (userId: string, userAccessLevel: number, newCourseDa
   if (existingCourse) {
     throw new Utils.Exceptions.ControlledException('Course with this name already exists', StatusCode.CONFLICT);
   }
-  const course = await DB.manager.save(Course, {
+  await DB.manager.save(Course, {
     ...newCourseData,
     targetAccessLevel: userAccessLevel,
     image: imageUrl,
     author: creator.nickname,
   });
-  return course;
+  return true;
 };
 
 const getAllCourses = async () => {
@@ -41,11 +43,14 @@ const getAllCourses = async () => {
 };
 
 const getCoursePreview = async (courseName: string) => {
-  const course = await DB.manager.findOneBy(Course, { name: courseName });
+  const course = await DB.manager.findOne(Course, {
+    where: { name: courseName },
+    relations: ['tests', 'lectures', 'practices'],
+  });
   if (!course) {
     throw new Utils.Exceptions.ControlledException('Course not found', StatusCode.NOT_FOUND);
   }
-  return course;
+  return Transforms.Course.toCourseManage(course);
 };
 
 const registerToCourse = async (userId: string, courseName: string): Promise<IModal> => {
@@ -56,15 +61,15 @@ const registerToCourse = async (userId: string, courseName: string): Promise<IMo
   }
   const user = await DB.manager.findOneByOrFail(User, { id: userId });
   await DB.manager.save(Student, { courseId: selectedCourse.id, userId: user.id });
-  return { message: "You've successfully registered to this course", type: 'Success' };
+  return { message: "You've successfully registered to this course", type: ModalType.Success };
 };
 
-export const coursesToManage = (userAccessLevel: number) => {
+const coursesToManage = (userAccessLevel: number) => {
   const courses = DB.manager.findBy(Course, { targetAccessLevel: LessThanOrEqual(userAccessLevel) });
   return courses;
 };
 
-export const courseToManage = async (courseId: string, userAccessLevel: number) => {
+const courseToManage = async (courseId: string, userAccessLevel: number) => {
   const course = await DB.manager.findOneOrFail(Course, {
     where: { id: courseId, targetAccessLevel: LessThanOrEqual(userAccessLevel) },
     relations: {
@@ -77,15 +82,37 @@ export const courseToManage = async (courseId: string, userAccessLevel: number) 
       practices: true,
     },
   });
-  return Transforms.Course.courseManage(course);
+  return Transforms.Course.toCourseManage(course);
 };
 
-export const userCourses = async (userId: string) => {
-  const courses = DB.manager.find(Student, { where: { userId }, relations: ['course'] });
-  return courses;
+const userCourses = async (userId: string) => {
+  const rawStudentCourses = await DB.manager.find(Student, {
+    where: { userId },
+    relations: {
+      course: {
+        tests: true,
+        lectures: true,
+        practices: true,
+      },
+      grades: true,
+    },
+  });
+  const studentCourses: IUserCourse[] = rawStudentCourses.map((student) => {
+    const course = student.course as IUserCourse;
+    const totalTasks: ITask[] = [...course.lectures, ...course.tests, ...course.practices];
+    const totalCompletedTasks = totalTasks.filter((task) =>
+      student.grades.find((grade) => grade.taskId === task.id && grade.rating >= 4),
+    );
+    course.progress = 0;
+    if (totalCompletedTasks.length !== 0) {
+      course.progress = +((totalCompletedTasks.length / totalTasks.length) * 100).toFixed(2);
+    }
+    return course;
+  });
+  return Transforms.Course.toUserCourses(studentCourses);
 };
 
-export const changeCourse = async (courseId: string, newCourseData: IChangeCourse, userAccessLevel: number) => {
+const changeCourse = async (courseId: string, newCourseData: IChangeCourse, userAccessLevel: number) => {
   const course = await DB.manager.findOneByOrFail(Course, {
     id: courseId,
     targetAccessLevel: LessThanOrEqual(userAccessLevel),
@@ -106,6 +133,22 @@ export const changeCourse = async (courseId: string, newCourseData: IChangeCours
   return changedCourse.raw[0];
 };
 
+const courseProgress = async (courseName: string, userId: string) => {
+  const targetCourse = await DB.manager.findOneByOrFail(Course, { name: courseName });
+  const courseProgress = await DB.manager.findOneOrFail(Student, {
+    where: { courseId: targetCourse.id, userId },
+    relations: {
+      course: {
+        tests: true,
+        lectures: true,
+        practices: true,
+      },
+      grades: true,
+    },
+  });
+  return Transforms.Course.toCourseProgress(courseProgress);
+};
+
 export default {
   createCourse,
   getAllCourses,
@@ -115,4 +158,5 @@ export default {
   coursesToManage,
   courseToManage,
   changeCourse,
+  courseProgress,
 };

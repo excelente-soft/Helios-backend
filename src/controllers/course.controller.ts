@@ -64,7 +64,7 @@ const coursesToManage = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const courseToManage = async (req: Request, res: Response, next: NextFunction) => {
+const courseToManage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { courseId } = req.params;
     Utils.Validator.validateBody({ courseId }, 'CourseIdSchema');
@@ -91,6 +91,16 @@ const changeCourse = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+const courseProgress = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseName } = req.params;
+    const changeResult = await Services.Course.courseProgress(courseName, req.user || '');
+    return Utils.Sender.sendToClient(res, changeResult);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   createCourse,
   courses,
@@ -100,4 +110,5 @@ export default {
   coursesToManage,
   courseToManage,
   changeCourse,
+  courseProgress,
 };

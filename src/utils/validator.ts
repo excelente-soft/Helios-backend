@@ -94,9 +94,10 @@ const Schemas = {
   IdSchema: Joi.object({
     id: Joi.string().required(),
   }),
-  ChangeTestNameSchema: Joi.object({
+  ChangeTestSchema: Joi.object({
     id: Joi.string().required(),
     name: Joi.string().min(3).required(),
+    time: Joi.number().integer().min(0).required(),
   }),
   testIdSchema: Joi.object({
     testId: Joi.string().required(),
@@ -109,6 +110,21 @@ const Schemas = {
     id: Joi.string().required(),
     answer: Joi.string().min(1).max(1024).required(),
     isCorrect: Joi.boolean().required(),
+  }),
+  UserRoleSchema: Joi.object({
+    name: Joi.string().pattern(notSpecialSymbol).min(2).max(24).required(),
+    secondName: Joi.string().pattern(notSpecialSymbol).min(2).max(24).required(),
+    nickname: Joi.string().pattern(notSpecialSymbol).pattern(nicknameRegExp).min(2).max(24).required(),
+    email: Joi.string().min(3).max(64).email().required(),
+    avatar: Joi.string().required(),
+    type: Joi.string().valid('public', 'private').required(),
+  }),
+  ChangePracticeSchema: Joi.object({
+    id: Joi.string().required(),
+    name: Joi.string().min(3).required(),
+    objective: Joi.string().min(10).required(),
+    objectiveType: Joi.string().valid('none', 'figma', 'codesandbox').required(),
+    link: Joi.optional(),
   }),
 };
 

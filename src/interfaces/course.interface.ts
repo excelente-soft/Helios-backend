@@ -1,3 +1,5 @@
+import { Course } from '../models/course.model';
+
 import { Timestamp } from 'typeorm';
 
 import { Lecture } from '@models/lecture.model';
@@ -22,4 +24,8 @@ export interface ICourseManage extends IChangeCourse {
   tests: Test[];
   lectures: Lecture[];
   practices: Practice[];
+}
+
+export interface IUserCourse extends Course {
+  progress: number;
 }

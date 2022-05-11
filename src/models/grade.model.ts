@@ -16,6 +16,9 @@ export class Grade {
   @Column()
   taskId: string;
 
+  @Column()
+  studentId: string;
+
   @ManyToOne(() => Student)
   student: Student;
 }

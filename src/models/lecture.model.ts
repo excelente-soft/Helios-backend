@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { TaskType } from '@interfaces/task.interface';
 
 import { Course } from './course.model';
 
@@ -10,8 +11,8 @@ export class Lecture {
   @Column()
   name: string;
 
-  @Column({ default: 'lecture', update: false })
-  type: string;
+  @Column({ default: TaskType.lecture, enum:TaskType.lecture, update: false })
+  type: TaskType.lecture;
 
   @Column()
   text: string;
