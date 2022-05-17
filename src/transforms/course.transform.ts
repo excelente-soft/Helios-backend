@@ -1,7 +1,6 @@
-import { Student } from '../models/student.model';
-
 import { ICourseManage, IUserCourse } from '@interfaces/course.interface';
 import { ITask } from '@interfaces/task.interface';
+import { Student } from '@models/student.model';
 
 const toTasks = (tasks: ITask[]) => {
   return tasks.map(({ id, name, position, courseId, type }) => ({ id, name, position, courseId, type }));
@@ -34,7 +33,19 @@ const toUserCourses = (studentCourses: IUserCourse[]) => {
   return studentCourses.map((course) => {
     const { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel, progress } =
       course;
-    return { author, creationDate, description, id, image, name, price, shortDescription, targetAccessLevel, progress };
+    return {
+      author,
+      creationDate,
+      description,
+      id,
+      image,
+      name,
+      price,
+      shortDescription,
+      targetAccessLevel,
+      progress,
+      hasCertificate: course.certificates.length !== 0,
+    };
   });
 };
 

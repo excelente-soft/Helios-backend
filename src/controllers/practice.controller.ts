@@ -57,10 +57,66 @@ const submitPractice = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
+const getFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const submitPracticeResult = await Services.Practice.getFeedbacks();
+    return Utils.Sender.sendToClient(res, submitPracticeResult);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getTaskQueue = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const taskQueue = await Services.Practice.getTaskQueue();
+    return Utils.Sender.sendToClient(res, taskQueue);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getTaskReview = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    Utils.Validator.validateBody({ id }, 'IdSchema');
+    const taskToReview = await Services.Practice.getTaskReview(id);
+    return Utils.Sender.sendToClient(res, taskToReview);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const submitFeedback = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id, rating, review } = req.body;
+    Utils.Validator.validateBody({ id, rating, review }, 'SubmitFeedbackSchema');
+    const taskToReview = await Services.Practice.submitFeedback(id, review, rating);
+    return Utils.Sender.sendToClient(res, taskToReview);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const userFeedbacks = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, practiceId } = req.params;
+    Utils.Validator.validateBody({ courseId, practiceId }, 'UserFeedbacksSchema');
+    const taskToReview = await Services.Practice.userFeedbacks(courseId, practiceId, req.user || '');
+    return Utils.Sender.sendToClient(res, taskToReview);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   createPractice,
   changePractice,
   deletePractice,
   submitPractice,
   getPreparedPractice,
+  getFeedbacks,
+  getTaskQueue,
+  getTaskReview,
+  submitFeedback,
+  userFeedbacks,
 };

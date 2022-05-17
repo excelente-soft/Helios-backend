@@ -7,15 +7,15 @@ export interface ITask {
 }
 
 export enum TaskType {
-  lecture = 'lecture',
-  test = 'test',
-  practice = 'practice',
+  LECTURE = 'lecture',
+  TEST = 'test',
+  PRACTICE = 'practice',
 }
 
 export enum ObjectiveType {
-  none = 'none',
-  figma = 'figma',
-  codesandbox = 'codesandbox',
+  NONE = 'none',
+  FIGMA = 'figma',
+  CODESANDBOX = 'codesandbox',
 }
 
 export interface IUserAnswer {

@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Answer } from './answer.model';
-import { Test } from './test.model';
+import { Answer } from '@models/answer.model';
+import { Test } from '@models/test.model';
 
 @Entity()
 export class Quest {

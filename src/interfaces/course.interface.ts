@@ -1,7 +1,7 @@
-import { Course } from '../models/course.model';
-
 import { Timestamp } from 'typeorm';
 
+import { Certificate } from '@models/certificate.model';
+import { Course } from '@models/course.model';
 import { Lecture } from '@models/lecture.model';
 import { Practice } from '@models/practice.model';
 import { Test } from '@models/test.model';
@@ -28,4 +28,5 @@ export interface ICourseManage extends IChangeCourse {
 
 export interface IUserCourse extends Course {
   progress: number;
+  certificates: Certificate[];
 }

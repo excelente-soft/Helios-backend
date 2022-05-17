@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Quest } from './quest.model';
+import { Quest } from '@models/quest.model';
 
 @Entity()
 export class Answer {

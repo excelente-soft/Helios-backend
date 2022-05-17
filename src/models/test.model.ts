@@ -1,8 +1,8 @@
 import { Entity, Column, JoinColumn, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { TaskType } from '@interfaces/task.interface';
 
-import { Course } from './course.model';
-import { Quest } from './quest.model';
+import { Course } from '@models/course.model';
+import { Quest } from '@models/quest.model';
 
 @Entity()
 export class Test {
@@ -15,8 +15,8 @@ export class Test {
   @Column()
   time: number;
 
-  @Column({ default: TaskType.test, enum:TaskType.test, update: false })
-  type: TaskType.test;
+  @Column({ default: TaskType.TEST, enum:TaskType.TEST, update: false })
+  type: TaskType.TEST;
 
   @Column()
   position: number;

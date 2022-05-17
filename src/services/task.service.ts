@@ -17,7 +17,7 @@ const changeTaskOrder = (tasks: ITask[]) => {
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     const newPosition = i + 1;
-    const taskClass = task.type === TaskType.lecture ? Lecture : task.type === TaskType.test ? Test : Practice;
+    const taskClass = task.type === TaskType.LECTURE ? Lecture : task.type === TaskType.TEST ? Test : Practice;
     DB.createQueryBuilder().update(taskClass).set({ position: newPosition }).where({ id: task.id }).execute();
   }
   return true;

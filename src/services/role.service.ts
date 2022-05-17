@@ -1,3 +1,5 @@
+import { LessThan } from 'typeorm';
+
 import { DB } from '@databases';
 import { StatusCode } from '@interfaces/status.interface';
 import { Role } from '@models/role.model';
@@ -8,8 +10,6 @@ const createRole = async (userAccessLevel: number, accessLevel: number, color: s
     throw new Utils.Exceptions.ControlledException('You have no permission to create this role', StatusCode.FORBIDDEN);
   }
   const existingRole = await DB.manager.findOneBy(Role, [{ accessLevel }, { color }, { roleName }]);
-  console.log(existingRole);
-
   if (existingRole) {
     if (existingRole.accessLevel == accessLevel) {
       throw new Utils.Exceptions.ControlledException(
@@ -32,4 +32,16 @@ const findRoleByAccessLevel = async (accessLevel: number) => {
   return role;
 };
 
-export default { createRole, findRoleByAccessLevel };
+const roles = async (accessLevel: number) => {
+  const roles = await DB.manager.find(Role, {
+    where: {
+      accessLevel: LessThan(accessLevel),
+    },
+    order: {
+      accessLevel: 'ASC',
+    },
+  });
+  return roles;
+};
+
+export default { createRole, findRoleByAccessLevel, roles };

@@ -126,6 +126,19 @@ const Schemas = {
     objectiveType: Joi.string().valid('none', 'figma', 'codesandbox').required(),
     link: Joi.optional(),
   }),
+  SubmitFeedbackSchema: Joi.object({
+    id: Joi.string().required(),
+    rating: Joi.number().integer().min(0).max(10).required(),
+    review: Joi.string().min(6).max(1024).required(),
+  }),
+  UserFeedbacksSchema: Joi.object({
+    practiceId: Joi.string().required(),
+    courseId: Joi.string().required(),
+  }),
+  ChangeRoleSchema: Joi.object({
+    userId: Joi.string().required(),
+    roleName: Joi.string().min(2).max(24).required(),
+  }),
 };
 
 const validateBody = (data: unknown, schema: keyof typeof Schemas) => {

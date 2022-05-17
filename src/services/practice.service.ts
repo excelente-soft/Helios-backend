@@ -1,6 +1,9 @@
+import { In, MoreThanOrEqual } from 'typeorm';
+
 import { DB } from '@databases';
 import { IModal, ModalType } from '@interfaces/modal.interface';
 import { ObjectiveType, TaskType } from '@interfaces/task.interface';
+import { Feedback } from '@models/feedback.model';
 import { Grade } from '@models/grade.model';
 import { Practice } from '@models/practice.model';
 import { Queue } from '@models/queue';
@@ -57,17 +60,78 @@ const submitPractice = async (practiceId: string, link: string, userId: string):
   if (!student) {
     throw new Utils.Exceptions.ControlledException('You can not complete this practice');
   }
-  await DB.manager.save(Queue, { link, practice: practice });
-  await DB.manager.save(Grade, {
+  const grade = await DB.manager.save(Grade, {
     taskId: practice.id,
     studentId: student.id,
     rating: 4,
-    type: TaskType.practice,
+    type: TaskType.PRACTICE,
   });
+  await DB.manager.save(Queue, { link, practice: practice, grade: grade });
   return {
     message: `Practice ${practice.name} has been submitted and will be graded shortly, temporarily your rating is 4`,
-    type: ModalType.Success,
+    type: ModalType.SUCCESS,
   };
+};
+
+const getFeedbacks = async () => {
+  const feedbacks = await DB.manager.find(Feedback, {
+    where: {
+      createdAt: MoreThanOrEqual(new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)),
+    },
+    take: 7,
+  });
+  return feedbacks;
+};
+
+const getTaskQueue = async () => {
+  const taskQueue = await DB.manager.find(Queue, {
+    order: {
+      position: 'DESC',
+    },
+    relations: ['practice'],
+  });
+  return taskQueue;
+};
+
+const getTaskReview = async (taskId: string) => {
+  const taskQueue = await DB.manager.findOne(Queue, {
+    where: {
+      id: taskId,
+    },
+    relations: ['practice'],
+  });
+  return taskQueue;
+};
+
+const submitFeedback = async (queueId: string, review: string, rating: number) => {
+  const queueTask = await DB.manager.findOne(Queue, {
+    where: { id: queueId },
+    relations: ['practice', 'grade'],
+  });
+  if (!queueTask) {
+    throw new Utils.Exceptions.ControlledException('Task not found Or somebody is already reviewing this task');
+  }
+  await DB.manager.save(Feedback, {
+    review,
+    rating,
+    practice: queueTask.practice,
+    grade: queueTask.grade,
+  });
+  await DB.createQueryBuilder()
+    .update(Grade)
+    .set({ rating })
+    .where({ id: queueTask.grade.id })
+    .returning('*')
+    .execute();
+  await DB.manager.delete(Queue, { id: queueId });
+  return true;
+};
+
+const userFeedbacks = async (courseId: string, practiceId: string, userId: string) => {
+  const student = await DB.manager.findOneOrFail(Student, { where: { userId, courseId }, relations: ['grades'] });
+  const gradesIds = student.grades.map((grade) => grade.id);
+  const feedbacks = await DB.manager.findBy(Feedback, { gradeId: In(gradesIds), practiceId });
+  return feedbacks;
 };
 
 export default {
@@ -76,4 +140,9 @@ export default {
   deletePractice,
   submitPractice,
   getPreparedPractice,
+  getFeedbacks,
+  getTaskQueue,
+  getTaskReview,
+  submitFeedback,
+  userFeedbacks,
 };

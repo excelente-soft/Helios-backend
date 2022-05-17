@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne,  Generated } from 'typeorm';
-import { Practice } from './practice.model';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne,  Generated, CreateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Grade } from '@models/grade.model';
+import { Practice } from '@models/practice.model';
 
 @Entity()
 export class Queue {
@@ -13,6 +14,13 @@ export class Queue {
   @Column()
   link: string;
 
+  @OneToOne(() => Grade)
+  @JoinColumn()
+  grade: Grade;
+
   @ManyToOne(() => Practice)
   practice: Practice;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

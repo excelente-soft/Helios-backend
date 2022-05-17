@@ -1,3 +1,8 @@
+import { Role } from '../models/role.model';
+import { Student } from '../models/student.model';
+
+import { LessThanOrEqual } from 'typeorm';
+
 import { DB } from '@databases';
 import { UserType } from '@interfaces/role.interface';
 import { StatusCode } from '@interfaces/status.interface';
@@ -107,13 +112,8 @@ const changeEmail = async (id: string, email: string, password: string) => {
   if (anotherUserWithEmail && user.id !== anotherUserWithEmail.id) {
     throw new Utils.Exceptions.ControlledException('This email is already used by someone', StatusCode.CONFLICT);
   }
-  const changedEmailResult = await DB.createQueryBuilder()
-    .update(User)
-    .set({ email })
-    .where({ id })
-    .returning(['email'])
-    .execute();
-  return { email: changedEmailResult.raw[0].email };
+  await DB.createQueryBuilder().update(User).set({ email }).where({ id }).returning(['email']).execute();
+  return true;
 };
 
 const changePassword = async (id: string, password: string, newPassword: string) => {
@@ -162,15 +162,60 @@ const changeAvatar = async (id: string, avatar: string) => {
   }
 };
 
-const userProfile = (nickname: string) => {
+const userProfile = async (nickname: string) => {
   return DB.manager.findOne(User, {
     where: {
       nickname,
-      type: UserType.Public,
+      type: UserType.PUBLIC,
     },
     relations: ['role'],
     select: ['id', 'name', 'secondName', 'nickname', 'avatar', 'type', 'email'],
   });
+};
+
+const fullUserProfile = async (nickname: string, accessLevel: number) => {
+  return DB.manager.findOne(User, {
+    where: { nickname, role: { accessLevel: LessThanOrEqual(accessLevel) } },
+    relations: ['role'],
+    select: ['id', 'name', 'secondName', 'nickname', 'avatar', 'type', 'email'],
+  });
+};
+
+const selfUserProfile = async (nickname: string, userId: string) => {
+  return DB.manager.findOne(User, {
+    where: { nickname, id: userId },
+    relations: ['role'],
+    select: ['id', 'name', 'secondName', 'nickname', 'avatar', 'type', 'email'],
+  });
+};
+
+const userCourses = async (userId: string) => {
+  const courses = await DB.manager.find(Student, {
+    where: { userId },
+    relations: ['course'],
+  });
+  return courses.map((course) => course.course);
+};
+
+const changeRole = async (id: string, roleName: string, userId: string) => {
+  const user = await DB.manager.findOne(User, {
+    where: {
+      id,
+    },
+    relations: ['role'],
+  });
+  const targetUser = await DB.manager.findOne(User, {
+    where: {
+      id: userId,
+    },
+    relations: ['role'],
+  });
+  if (!user || !targetUser || user?.role.accessLevel <= targetUser?.role.accessLevel) {
+    throw new Utils.Exceptions.ControlledException('You can not change role of this user', StatusCode.FORBIDDEN);
+  }
+  const role = await DB.manager.findOneByOrFail(Role, { roleName });
+  await DB.createQueryBuilder().update(User).set({ roleId: role.id }).where({ id: userId }).execute();
+  return true;
 };
 
 export default {
@@ -184,4 +229,8 @@ export default {
   changeAvatar,
   userRole,
   userProfile,
+  fullUserProfile,
+  userCourses,
+  selfUserProfile,
+  changeRole,
 };

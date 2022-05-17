@@ -6,6 +6,7 @@ import { DB } from '@databases';
 import { IChangeCourse, ICreateCourse, IUserCourse } from '@interfaces/course.interface';
 import { IModal, ModalType } from '@interfaces/modal.interface';
 import { StatusCode } from '@interfaces/status.interface';
+import { Certificate } from '@models/certificate.model';
 import { Course } from '@models/course.model';
 import { Student } from '@models/student.model';
 import { User } from '@models/user.model';
@@ -61,7 +62,7 @@ const registerToCourse = async (userId: string, courseName: string): Promise<IMo
   }
   const user = await DB.manager.findOneByOrFail(User, { id: userId });
   await DB.manager.save(Student, { courseId: selectedCourse.id, userId: user.id });
-  return { message: "You've successfully registered to this course", type: ModalType.Success };
+  return { message: "You've successfully registered to this course", type: ModalType.SUCCESS };
 };
 
 const coursesToManage = (userAccessLevel: number) => {
@@ -95,6 +96,7 @@ const userCourses = async (userId: string) => {
         practices: true,
       },
       grades: true,
+      certificates: true,
     },
   });
   const studentCourses: IUserCourse[] = rawStudentCourses.map((student) => {
@@ -104,11 +106,13 @@ const userCourses = async (userId: string) => {
       student.grades.find((grade) => grade.taskId === task.id && grade.rating >= 4),
     );
     course.progress = 0;
+    course.certificates = student.certificates;
     if (totalCompletedTasks.length !== 0) {
       course.progress = +((totalCompletedTasks.length / totalTasks.length) * 100).toFixed(2);
     }
     return course;
   });
+
   return Transforms.Course.toUserCourses(studentCourses);
 };
 
@@ -149,6 +153,32 @@ const courseProgress = async (courseName: string, userId: string) => {
   return Transforms.Course.toCourseProgress(courseProgress);
 };
 
+const getCertificate = async (courseId: string, userId: string): Promise<IModal> => {
+  const targetCourse = await DB.manager.findOneByOrFail(Course, { id: courseId });
+  const courseProgress = await DB.manager.findOneOrFail(Student, {
+    where: { courseId: targetCourse.id, userId },
+    relations: {
+      course: {
+        tests: true,
+        lectures: true,
+        practices: true,
+      },
+      grades: true,
+      user: true,
+    },
+  });
+  const totalHours =
+    courseProgress.course.tests.length + courseProgress.course.lectures.length + courseProgress.course.practices.length;
+  await DB.manager.save(Certificate, {
+    name: courseProgress.user.name,
+    secondName: courseProgress.user.secondName,
+    courseName: targetCourse.name,
+    hours: totalHours,
+    studentId: courseProgress.id,
+  });
+  return { message: 'Certificate successfully generated', type: ModalType.SUCCESS };
+};
+
 export default {
   createCourse,
   getAllCourses,
@@ -159,4 +189,5 @@ export default {
   courseToManage,
   changeCourse,
   courseProgress,
+  getCertificate,
 };

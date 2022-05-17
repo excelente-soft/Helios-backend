@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 
 import { UserType } from '@interfaces/role.interface';
 
-import { Role } from './role.model';
+import { Role } from '@models/role.model';
 
 @Entity()
 export class User {
@@ -36,6 +36,6 @@ export class User {
   @Column()
   roleId: string;
 
-  @Column({ type: 'enum', enum: UserType, default: UserType.Public })
+  @Column({ type: 'enum', enum: UserType, default: UserType.PUBLIC })
   type: string;
 }

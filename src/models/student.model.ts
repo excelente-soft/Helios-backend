@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
-
-import { Course } from './course.model';
-import { Grade } from './grade.model';
-import { User } from './user.model';
+import { Certificate } from '@models/certificate.model';
+import { Course } from '@models/course.model';
+import { Grade } from '@models/grade.model';
+import { User } from '@models/user.model';
 
 @Entity()
 export class Student {
@@ -25,4 +25,7 @@ export class Student {
 
   @OneToMany(() => Grade, (grade) => grade.student)
   grades: Grade[];
+
+  @OneToMany(() => Certificate, (certificate) => certificate.student)
+  certificates: Certificate[];
 }

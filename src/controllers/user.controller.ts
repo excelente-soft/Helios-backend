@@ -58,6 +58,17 @@ const changeAvatar = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+const changeRole = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { roleName, userId } = req.body;
+    Utils.Validator.validateBody({ roleName, userId }, 'ChangeRoleSchema');
+    const changedUser = await Services.User.changeRole(req.user || '', roleName, userId);
+    return Utils.Sender.sendToClient(res, changedUser);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const myRole = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { avatar, email, name, nickname, secondName, type } = req.body;
@@ -79,6 +90,36 @@ const userProfile = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const fullUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { nickname } = req.params;
+    const fullUserProfile = await Services.User.fullUserProfile(nickname, req.accessLevel || 0);
+    return Utils.Sender.sendToClient(res, fullUserProfile);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const selfUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { nickname } = req.params;
+    const fullUserProfile = await Services.User.selfUserProfile(nickname, req.user || '');
+    return Utils.Sender.sendToClient(res, fullUserProfile);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const userCourses = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+    const fullUserProfile = await Services.User.userCourses(userId);
+    return Utils.Sender.sendToClient(res, fullUserProfile);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   changeProfile,
   changeEmail,
@@ -87,4 +128,8 @@ export default {
   changeAvatar,
   myRole,
   userProfile,
+  fullUserProfile,
+  userCourses,
+  selfUserProfile,
+  changeRole,
 };

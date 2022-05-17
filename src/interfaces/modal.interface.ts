@@ -4,7 +4,7 @@ export interface IModal {
 }
 
 export enum ModalType {
-  Error = 'Error',
-  Success = 'Success',
-  Info = 'Info',
+  ERROR = 'Error',
+  SUCCESS = 'Success',
+  INFO = 'Info',
 }

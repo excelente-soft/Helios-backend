@@ -7,5 +7,6 @@ import { authMiddleware } from '@middlewares/auth.middleware';
 const router = express.Router();
 
 router.post('/create-role', authMiddleware, adminMiddleware, Controllers.Role.createRole);
+router.get('/get-roles', authMiddleware, adminMiddleware, Controllers.Role.roles);
 
 export default router;

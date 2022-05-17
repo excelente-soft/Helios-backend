@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, Timestamp, OneToMany } from 'typeorm';
 
-import { Lecture } from './lecture.model';
-import { Practice } from './practice.model';
-import { Test } from './test.model';
+import { Lecture } from '@models/lecture.model';
+import { Practice } from '@models/practice.model';
+import { Test } from '@models/test.model';
 
 @Entity()
 export class Course {

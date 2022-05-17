@@ -1,4 +1,4 @@
 export enum UserType {
-  Public = 'public',
-  Private = 'private',
+  PUBLIC = 'public',
+  PRIVATE = 'private',
 }

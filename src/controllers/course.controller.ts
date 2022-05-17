@@ -101,6 +101,17 @@ const courseProgress = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
+const getCertificate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId } = req.body;
+    Utils.Validator.validateBody({ courseId }, 'CourseIdSchema');
+    const certificate = await Services.Course.getCertificate(courseId, req.user || '');
+    return Utils.Sender.sendToClient(res, certificate);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   createCourse,
   courses,
@@ -111,4 +122,5 @@ export default {
   courseToManage,
   changeCourse,
   courseProgress,
+  getCertificate,
 };

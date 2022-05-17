@@ -80,11 +80,11 @@ const submitTest = async (testId: string, answers: IUserAnswer[], userId: string
     taskId: test.id,
     studentId: student.id,
     rating,
-    type: TaskType.test,
+    type: TaskType.TEST,
   });
   return {
     message: `Test completed your rating is: ${rating}`,
-    type: rating >= 4 ? ModalType.Success : ModalType.Error,
+    type: rating >= 4 ? ModalType.SUCCESS : ModalType.ERROR,
   };
 };
 

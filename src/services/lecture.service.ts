@@ -51,7 +51,7 @@ const submitLecture = async (id: string, userId: string) => {
   }
   const hasLectureGrade = await DB.manager.findOneBy(Grade, { taskId: id, studentId: student.id });
   if (!hasLectureGrade) {
-    await DB.manager.save(Grade, { taskId: id, studentId: student.id, rating: 4, type: TaskType.lecture });
+    await DB.manager.save(Grade, { taskId: id, studentId: student.id, rating: 4, type: TaskType.LECTURE });
   }
   return true;
 };

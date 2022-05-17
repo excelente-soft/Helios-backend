@@ -14,6 +14,16 @@ const createRole = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const roles = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const createdRole = await Services.Role.roles(req.accessLevel || 0);
+    return Utils.Sender.sendToClient(res, createdRole);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   createRole,
+  roles,
 };

@@ -3,18 +3,21 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } f
 import { Student } from '@models/student.model';
 
 @Entity()
-export class Grade {
+export class Certificate {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  type: string;
+  hours: number;
 
   @Column()
-  rating: number;
+  name: string;
 
   @Column()
-  taskId: string;
+  secondName: string;
+
+  @Column()
+  courseName: string;
 
   @Column()
   studentId: string;

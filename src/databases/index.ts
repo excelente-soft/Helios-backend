@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from '@config';
 import { Answer } from '@models/answer.model';
+import { Certificate } from '@models/certificate.model';
 import { Course } from '@models/course.model';
 import { Feedback } from '@models/feedback.model';
 import { Grade } from '@models/grade.model';
@@ -23,7 +24,22 @@ export const DB = new DataSource({
   username: DB_USER,
   password: DB_PASSWORD,
   database: DB_DATABASE,
-  entities: [User, Token, Role, Student, Course, Lecture, Test, Quest, Answer, Feedback, Queue, Grade, Practice],
+  entities: [
+    User,
+    Token,
+    Role,
+    Student,
+    Course,
+    Lecture,
+    Test,
+    Quest,
+    Answer,
+    Feedback,
+    Queue,
+    Grade,
+    Practice,
+    Certificate,
+  ],
   synchronize: true,
   logging: false,
   ssl: true,
