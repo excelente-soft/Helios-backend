@@ -1,3 +1,4 @@
+import { Certificate } from '../models/certificate.model';
 import { Role } from '../models/role.model';
 import { Student } from '../models/student.model';
 
@@ -218,6 +219,21 @@ const changeRole = async (id: string, roleName: string, userId: string) => {
   return true;
 };
 
+const certificates = async (userId: string) => {
+  const studentRows = await DB.manager.find(Student, {
+    where: { userId },
+    relations: {
+      certificates: true,
+    },
+  });
+  return Transforms.User.toCertificates(studentRows.filter((student) => student.certificates.length > 0));
+};
+
+const certificate = async (certificateId: string) => {
+  const certificate = await DB.manager.findOneBy(Certificate, { id: certificateId });
+  return certificate;
+};
+
 export default {
   auth,
   signup,
@@ -233,4 +249,6 @@ export default {
   userCourses,
   selfUserProfile,
   changeRole,
+  certificates,
+  certificate,
 };

@@ -20,7 +20,6 @@ const toCourseManage = (courseToManage: ICourseManage) => {
     lectures,
     practices,
   } = courseToManage;
-
   return {
     course: { id, name, creationDate, shortDescription, description, image, price, targetAccessLevel },
     tests: tests,

@@ -1,5 +1,6 @@
 import { ITask } from '../interfaces/task.interface';
 
+import _ from 'lodash';
 import { LessThanOrEqual } from 'typeorm';
 
 import { DB } from '@databases';
@@ -101,7 +102,7 @@ const userCourses = async (userId: string) => {
   });
   const studentCourses: IUserCourse[] = rawStudentCourses.map((student) => {
     const course = student.course as IUserCourse;
-    const totalTasks: ITask[] = [...course.lectures, ...course.tests, ...course.practices];
+    const totalTasks: ITask[] = _.concat<ITask>(course.lectures, course.tests, course.practices);
     const totalCompletedTasks = totalTasks.filter((task) =>
       student.grades.find((grade) => grade.taskId === task.id && grade.rating >= 4),
     );

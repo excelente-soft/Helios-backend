@@ -120,6 +120,26 @@ const userCourses = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const certificates = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const fullUserProfile = await Services.User.certificates(req.user || '');
+    return Utils.Sender.sendToClient(res, fullUserProfile);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const certificate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    Utils.Validator.validateBody({ id }, 'IdSchema');
+    const certificate = await Services.User.certificate(id);
+    return Utils.Sender.sendToClient(res, certificate);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   changeProfile,
   changeEmail,
@@ -132,4 +152,6 @@ export default {
   userCourses,
   selfUserProfile,
   changeRole,
+  certificates,
+  certificate,
 };

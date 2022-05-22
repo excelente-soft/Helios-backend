@@ -1,5 +1,6 @@
 import { IPairTokens } from '@interfaces/token.interface';
 import { Role } from '@models/role.model';
+import { Student } from '@models/student.model';
 import { User } from '@models/user.model';
 
 const toUserAuth = (tokens: IPairTokens, user: User, role: Role) => {
@@ -34,7 +35,12 @@ const toUserRole = (role: Role) => {
   };
 };
 
+const toCertificates = (rows: Student[]) => {
+  return rows.map((row) => row.certificates[0]);
+};
+
 export default {
   toUserAuth,
   toUserRole,
+  toCertificates,
 };

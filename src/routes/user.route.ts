@@ -17,5 +17,7 @@ router.get('/profile/:nickname', Controllers.User.userProfile);
 router.get('/profile/full/:nickname', authMiddleware, adminMiddleware, Controllers.User.fullUserProfile);
 router.get('/profile/me/:nickname', authMiddleware, Controllers.User.selfUserProfile);
 router.get('/profile/courses/:userId', Controllers.User.userCourses);
+router.get('/certificates', authMiddleware, Controllers.User.certificates);
+router.get('/certificates/:id', Controllers.User.certificate);
 
 export default router;
