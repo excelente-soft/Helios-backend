@@ -1,12 +1,11 @@
-import { Certificate } from '../models/certificate.model';
-import { Role } from '../models/role.model';
-import { Student } from '../models/student.model';
-
 import { LessThanOrEqual } from 'typeorm';
 
 import { DB } from '@databases';
 import { UserType } from '@interfaces/role.interface';
 import { StatusCode } from '@interfaces/status.interface';
+import { Certificate } from '@models/certificate.model';
+import { Role } from '@models/role.model';
+import { Student } from '@models/student.model';
 import { User } from '@models/user.model';
 import { Transforms } from '@transforms';
 import { Utils } from '@utils';

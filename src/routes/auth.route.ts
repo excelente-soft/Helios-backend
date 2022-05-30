@@ -10,4 +10,3 @@ router.post('/validate', Controllers.Auth.validate);
 router.post('/refresh', Controllers.Auth.refresh);
 
 export default router;
-

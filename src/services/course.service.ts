@@ -1,5 +1,3 @@
-import { ITask } from '../interfaces/task.interface';
-
 import _ from 'lodash';
 import { LessThanOrEqual } from 'typeorm';
 
@@ -7,6 +5,7 @@ import { DB } from '@databases';
 import { IChangeCourse, ICreateCourse, IUserCourse } from '@interfaces/course.interface';
 import { IModal, ModalType } from '@interfaces/modal.interface';
 import { StatusCode } from '@interfaces/status.interface';
+import { ITask } from '@interfaces/task.interface';
 import { Certificate } from '@models/certificate.model';
 import { Course } from '@models/course.model';
 import { Student } from '@models/student.model';

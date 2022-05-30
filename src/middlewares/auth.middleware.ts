@@ -24,4 +24,3 @@ export const authMiddleware = async (req: Request, _: Response, next: NextFuncti
     next(err);
   }
 };
-

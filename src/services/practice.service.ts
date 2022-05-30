@@ -78,9 +78,12 @@ const getFeedbacks = async () => {
     where: {
       createdAt: MoreThanOrEqual(new Date(Date.now() - 1000 * 60 * 60 * 24 * 7)),
     },
+    order: {
+      createdAt: 'DESC',
+    },
     take: 7,
   });
-  return feedbacks;
+  return feedbacks.reverse();
 };
 
 const getTaskQueue = async () => {
