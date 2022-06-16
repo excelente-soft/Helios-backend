@@ -12,8 +12,6 @@ export const errorMiddleware = (
 ) => {
   if (err instanceof Utils.Exceptions.ControlledException) {
     return Utils.Sender.sendToClient(res, null, err.message, err.code);
-  } else if (err instanceof Error) {
-    console.log(err.message);
   }
   return Utils.Sender.sendToClient(res, null, 'Internal server error', StatusCode.INTERNAL_SERVER_ERROR);
 };
